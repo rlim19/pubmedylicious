@@ -1,0 +1,219 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<br>
+<br>
+<br>
+<div class="well well-lg">
+    <h1>
+        Your Query : <strong>{{query_terms | replace("+", " ") | title}}</strong>
+    </h1>                    
+</div>
+
+<!-- Publication Trend -->
+<h1> Publication Trend </h1>
+<div class="container" style="width:40%">
+    {% if pubyeardict | length > 1 %}
+        <canvas width='100px' height='100px' id="pubtrend" style='padding-left: 0; padding-right: 0; margin-left: auto; margin-right: auto;display: block;'>
+        </canvas>
+    {% else %}
+        <h3>
+        Published work in {{ pubyeardict.keys()[0] | safe }}
+        </h3>
+    {% endif %}
+</div>
+
+<!-- Author Tag -->
+<h1>Top Authors</h1>
+<div id="authorContainer">
+    <canvas width='700px' height='700px' id="authortag" style='padding-left: 0; padding-right: 0; margin-left: auto; margin-right: auto;display: block;'>
+    <p>Author Tags</p>
+    </canvas>
+</div>
+<div id="tags">
+    <ul>
+    {% for auth, freq in authdict.iteritems() %}
+    <li>
+        <font size="{{freq}}">
+            <a href='javascript:;'>{{auth | title}}</a>
+        </font >
+    </li>
+    {% endfor %}
+    </ul>
+</div>
+
+<h1> Country Profile </h1>
+<div class="container" style="width:30%">
+    <canvas width='100px' height='100px' id="countrytrend" style='padding-left: 0; padding-right: 0; margin-left: auto; margin-right: auto;display: block;'>
+    </canvas>
+</div>
+
+<!--  Journal Profile -->
+<h1> Top Journals</h1>
+<div id="journalcontainer" style='width:50%; padding-left: 0; padding-right: 0; margin-left: auto; margin-right: auto;display: block;'>
+</div>
+
+<!-- Area for abstracts -->
+<h1>{{num_abst}} Abstracts Found </h1>
+<hr>
+
+<div class="container">
+
+    {%- for article_row in abstlst | batch(2) %}
+    <div class="row">
+            {%- for article in article_row %}
+            <div class="col-md-6">
+
+            <h2>
+                <a class="brand" href={{"http://www.ncbi.nlm.nih.gov/pubmed/%s"%article['pmid']}} target='_blank'>
+                    {{article['title']}}
+                </a>
+            </h2>
+            <p>{{article['text'] | safe}}</p>
+            </div>
+            {%- endfor %}
+    </div>
+    {%- endfor %}
+
+</div>
+{% endblock %}
+
+
+{% block footscript %}
+<script src="/js/tagcanvas.min.js" type="text/javascript"></script>
+<script src="/js/Chart.js"></script>
+<script src="/js/d3.min.js"></script>
+<script src="/js/d3.layout.cloud.js"></script>
+<script type="text/javascript">
+    // Author Tag
+    var authortag = function(){
+        try {
+        TagCanvas.Start('authortag','tags',{
+            textColour: '#3a87ad',
+            outlineColour: 'transparent',
+            textFont: 'Helvetica',
+            reverse: true,
+            weight: true,
+            depth: 0.8,
+            maxSpeed: 0.05
+        });
+
+
+        } catch(e) {
+        // something went wrong, hide the canvas container
+        document.getElementById('authorContainer').style.display = 'none';
+
+        }
+    }
+
+    // pubtrend
+    var lineChartData = {
+        //labels : ["January","February","March"],
+        labels : {{pubyeardict.keys() | safe }},
+        //labels : {{pubyear | safe}},
+        datasets : [
+            {
+                label: "# of Yearly Publications",
+                fillColor : "rgba(220,220,220,0.2)",
+                strokeColor : "rgba(220,220,220,1)",
+                pointColor : "rgba(220,220,220,1)",
+                pointStrokeColor : "#fff",
+                pointHighlightFill : "#fff",
+                pointHighlightStroke : "rgba(220,220,220,1)",
+                data : {{pubyeardict.values() | safe}}
+                //data : {{pubvalues | safe}}
+                //data : [randomScalingFactor(),randomScalingFactor(),randomScalingFactor()]
+            }
+        ]
+
+    }
+
+    var pubtrend = function(){
+        var ctx = document.getElementById("pubtrend").getContext("2d");
+        window.myLine = new Chart(ctx).Line(lineChartData, {
+            responsive: true,
+            bezierCurve: false,
+            scaleBeginAtZero: true,
+        });
+    }
+
+    // countrytrend
+    var countrydata = [
+        
+        // e.g. countrydict = {'chine': (3, '#F7464A', '#FF5A5E')} 
+        // value[0] is the freq, value[1] is the color, value[2] is the highlight color
+            // value: 50,
+            // color: "#46BFBD",
+            // highlight: "#5AD3D1",
+            // label: "Green"
+        {% for key, value in countrydict.iteritems() %}
+        {
+            value: {{ value[0] }},
+            color: "{{ value[1] }}",
+            highlight: "{{ value[2] }}", 
+            label: "{{ key }}"
+        },
+        {% endfor %}
+
+    ];
+    var countrytrend = function(){
+        //debugger
+        var ctx = document.getElementById("countrytrend").getContext("2d");
+        window.myLine = new Chart(ctx).PolarArea(countrydata, {
+            responsive: true,
+            scaleShowLabels: true,
+        });
+    }
+
+    window.onload = function() {
+        authortag();
+        pubtrend();
+        countrytrend();
+    };
+
+    // journal cloud
+    var frequency_list = [
+
+    {%- for journal, freq in journaldict.iteritems() %}
+    {"text":"{{journal | capitalize | safe }}","size":{{freq * 20}}},
+    {%- endfor %}
+
+    ]
+var color = d3.scale.linear()
+        .domain([0,1,2,3,4,5,6,10,15,20,100])
+        .range(["#ddd", "#ccc", "#bbb", "#aaa", "#999", "#888", "#777", "#666", "#555", "#444", "#333", "#222"]);
+
+d3.layout.cloud().size([500,500 ])
+        .words(frequency_list)
+        .padding(5)
+        .rotate(0)
+        .font("Impact")
+        .fontSize(function(d) { return d.size; })
+        .on("end", draw)
+        .start();
+
+function draw(words) {
+    d3.select("#journalcontainer").append("svg")
+            .attr("width", 500)
+            .attr("height", 500)
+            .attr("class", "wordcloud")
+            .append("g")
+            // without the transform, words words would get cutoff to the left and top, they would
+            // appear outside of the SVG area
+            .attr("transform", "translate(250,250)")
+            .selectAll("text")
+            .data(words)
+            .enter().append("text")
+            .style("font-size", function(d) { return d.size + "px"; })
+            .style("fill", function(d, i) { return color(i); })
+            .attr("text-anchor", "middle")
+            .attr("transform", function(d) {
+                return "translate(" + [d.x, d.y] + ")rotate(" + d.rotate + ")";
+            })
+            .text(function(d) { return d.text; });
+}
+
+</script>
+
+{% endblock %}

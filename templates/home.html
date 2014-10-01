@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+
+{% block customcss %}
+    <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.0/css/font-awesome.css" rel="stylesheet">
+    <link href="/css/login.css" rel="stylesheet">
+    <link href="/css/search.css" rel="stylesheet">
+    <link href="/css/upload.css" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+    <hr>
+    <div class="jumbotron">
+        <div class="container">    
+            <h1>#Pubmedylicious <sub><small>BETA</small></sub></h1>
+        <blockquote style="border-color: #ddd;">
+            Getting quick insight from <strong>PubMed Scientific Literatures</strong>.
+        </blockquote>
+        <small><i>Best viewed in Google Chrome</i></small>
+
+        </div>
+    </div>
+
+    {% if uid is not defined %}
+
+        <!-- Login Area-->
+
+        <div class="container">
+            
+            <script id="metamorph-1-start" type="text/x-placeholder"></script><script id="metamorph-21-start" type="text/x-placeholder"></script>
+
+            <div class="container text-center">
+                <form class="form-signin" data-ember-action="2">
+                    <h2 class="form-signin-heading">Sign in</h2>
+
+                    <small class="text-muted">Connect [pubmedylicious] with your favorite social network</small>
+                    <br><br>
+
+                    
+        <p>
+        <a class="btn btn-primary social-login-btn social-facebook" href="/login/fb"><i class="fa fa-facebook"></i></a>
+        <a class="btn btn-primary social-login-btn social-twitter" href="/login/tw"><i class="fa fa-twitter"></i></a>
+        </p>
+
+        <p>
+        <a class="btn btn-primary social-login-btn social-linkedin" href="/login/github"><i class="fa fa-github"></i></a>
+        <a class="btn btn-primary social-login-btn social-google" href="/login/google"><i class="fa fa-google-plus"></i></a>
+        </p>
+                </form>
+
+    {% endif %}
+
+
+        <!-- Pubmed Search -->
+        <form class="form-inline global-search" method='post'>
+            <div class="form-group">
+                <label class="sr-only">Enter PubMed search terms</label>
+                <input type="search" name='query' class="form-control" placeholder="Enter search terms">
+
+            </div>
+            <button type="submit" class="btn btn-default"><span class="glyphicon glyphicon-search"></span>
+
+                </button> 
+                <a href="http://www.nlm.nih.gov/bsd/mms/medlineelements.html" target="_blank">
+                    Search Help
+                </a>
+        </form>
+
+
+        {% if uid is defined %}
+        <br>
+        <!-- Upload Paper -->
+        <form action="/summary" method="POST" enctype="multipart/form-data" >
+            <div class="container text-center">
+                <p>
+                Getting <strong>quick insight</strong> on your paper with pubmedylicious. 
+                </p>
+                <span class="btn btn-default btn-file">
+                    Upload paper: <input type="file" name="file">
+                </span>
+
+                <button type="submit" name="submit" value="Submit" class="btn btn-small"> Submit <span class="glyphicon glyphicon-upload"></span>
+                </button> 
+            </div>
+        
+        </form>
+        <br>
+        {% endif %}
+
+        </div>
+    </div>
+
+
+
+    {% if error_login is defined %}
+    <div class="alert alert-dismissable alert-danger">
+        <button type="button" class="close" data-dismiss="alert">×</button>
+        {{error_login}}
+    </div>
+    {% endif %}
+
+
+{% endblock %}

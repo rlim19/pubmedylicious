@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>PubMedylicious </title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="/css/bootstrap.css" rel="stylesheet">
+    <link href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-glyphicons.css" rel="stylesheet">
+    <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
+
+    <style>
+        .dropdown-backdrop {
+            position: static;
+        }
+    </style>
+
+    {% block customcss %}
+    {% endblock %}
+
+    </head>
+
+    <body>
+
+    <div class="navbar navbar-default navbar-fixed-top">
+
+        <div class="navbar-header">
+
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+
+            <a class="navbar-brand" href="/" >
+                <span class="glyphicon glyphicon-beer"></span>
+                Home
+            </a>
+        </div>
+
+        
+        <div class="navbar-collapse collapse navbar-responsive-collapse">
+            <ul class="nav navbar-nav">
+                <li class="">
+                    <a href="/">
+                        ABOUT
+                    </a>
+                </li>
+            </ul>
+
+        {% if username is defined %}
+
+            <p class="navbar-text navbar-right" data-toggle="dropdown">
+                Hi <b>{{ username }} </b>  
+                <span class="glyphicon glyphicon-user"></span>
+                <span class="caret"></span>
+            </p>
+
+                <ul class="dropdown-menu dropdown-menu-right" role="menu" 
+                    aria-labelledby="dropdownMenu1">
+                    <li role="presentation">
+                        <a role="menuitem" tabindex="-1" href="/logout">logout</a>
+                    </li>
+                    <li role="presentation">
+                    <a role="menuitem" tabindex="-1" href="/history/{{uid}}">
+                            history
+                        </a>
+                    </li>
+                </ul>
+
+        {% endif %}
+
+        
+        {% block controls %}
+        {% endblock %}
+
+        </div><!--/.navbar-collapse -->
+        
+    </div>
+
+    {% block content %}
+    {% endblock %}
+
+    <div class="footer">
+        <div class="container">
+            <p class="text-muted pull-left">
+                &copy;left: <b>rlim</b> 
+                <a href="https://github.com/rickylim19/PubmedAnalytics" target="_blank"><i class="fa fa-github"></i></a>
+            </p>
+        </div>
+    </div>
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
+    <script src="/js/jquery.min.js"></script>
+
+  </body>
+
+  {% block footscript%}
+  {% endblock %}
+</html>

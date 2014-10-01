@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block customcss %}
+    <link href="/css/page.css" rel="stylesheet">
+{% endblock %}
+
+
+{% block content %}
+<br>
+<br>
+<br>
+<div class="container">
+    <div class="page-header">
+        <h2><small><strong>{{username}}</strong>: query history </small></h2>
+    </div>
+    <table class="table table-striped table-hover">
+        <thead>
+            <tr>
+                <th>Username</th>
+                <th>Date</th>
+                <th>Query Terms</th>
+                <th>Result</th>
+            </tr>
+        </thead>
+        {% for r in results %}
+        <tr >
+            <td> 
+                {{ r.username}} 
+            </td>
+            <td> 
+                {{ r.created.strftime('%c') }} 
+            </td>
+            <td> 
+                {{ r.query_terms }} 
+            </td>
+            <td> 
+                <a href="/result/{{r.key.id()}}" target="_blank">Result</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+</div>
+
+{% endblock %}
+

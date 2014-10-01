@@ -1,0 +1,4 @@
+authconfig.py
+authconfig.pyc
+userAccount/*
+*.pyc
