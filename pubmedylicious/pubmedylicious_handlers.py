@@ -239,6 +239,7 @@ class UploadHandler(blobstore_handlers.BlobstoreUploadHandler,
             download_link = 'http://pubmedylicious.appspot.com/download/%s'%(sha1_digest) 
             logging.error(download_link)
             paper_ref = PaperRef(
+                id = sha1_digest,
                 uid = self.uid,
                 uname = self.uname,
                 download_link = download_link, 
@@ -250,10 +251,10 @@ class UploadHandler(blobstore_handlers.BlobstoreUploadHandler,
 
 
 class DownloadHandler(blobstore_handlers.BlobstoreDownloadHandler):
-    def get(self, path):
-        logging.error(path)
-        paper = PaperRef.get_by_key_name(path)
-        self.send_blob(paper.blob_key, save_as=True)
+    def get(self, file_id):
+        paper_info = PaperRef.get_by_id(file_id)
+        self.send_blob(blobstore.BlobInfo.get(paper_info.blob_key),
+                       save_as = True)
 
 
 class ByBlobKeyHandler(blobstore_handlers.BlobstoreDownloadHandler):
